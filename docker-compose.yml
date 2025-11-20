@@ -1,0 +1,41 @@
+
+
+services:
+
+  tcp-client:
+    build: ./client
+    networks:
+      - custom-net
+    depends_on:
+      - tcpdump
+    environment:
+    - SERVER_PORT=${SERVER_PORT}
+
+
+  tcp-server:
+    build: ./server
+    networks:
+      - custom-net
+    environment:
+    - SERVER_PORT=${SERVER_PORT}
+
+
+  tcpdump:
+    image: nicolaka/netshoot # Uma imagem Docker leve com tcpdump
+    network_mode: service:tcp-server
+
+    cap_add:
+      - NET_ADMIN 
+    volumes:
+      - ./captures:/captures
+            
+    
+    command: ["tcpdump", "-i", "any", "-w", "/captures/capture.pcap"]
+
+    # Não queremos que ele rode continuamente, apenas capture um pouco e pare
+    # O sniffer deve ser iniciado antes do cliente, mas o comando não termina
+    # até que seja interrompido ou o container pare.
+
+networks:
+  custom-net:
+    driver: bridge
