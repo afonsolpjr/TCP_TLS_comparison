@@ -10,6 +10,11 @@ services:
       - tcpdump
     environment:
     - SERVER_PORT=${SERVER_PORT}
+    - SSLKEYLOGFILE=${SSLKEYLOGFILE}
+    volumes:
+      - ./captures:/captures
+            
+
 
 
   tcp-server:
